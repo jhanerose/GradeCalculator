@@ -1,0 +1,897 @@
+<!DOCTYPE html> 
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1.0">
+  <title>BSCSIT 1203 9301 Programming 2 - Grade Calculator</title>
+  <link rel="shortcut icon" type="image/x-icon" href="logo.png" />
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,400;0,600;1,400;1,600&display=swap');
+
+    body {
+      font-family: 'Montserrat', sans-serif;
+      text-align: center;
+      background: url('background.png') no-repeat center center fixed;
+      background-size: cover;
+      color: #333;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    /* Notebook-style container */
+    .container {
+      width: 55%;
+      background: #fdfdfd;
+      padding: 40px 25px 25px 25px;
+      border-radius: 10px;
+      box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+      border: 1px solid #ccc;
+      position: relative;
+      background-image: repeating-linear-gradient(
+        to bottom,
+        transparent,
+        transparent 29px,#e0e0e0 30px
+      );
+      margin-top: 40px;
+    }
+    
+    /* Notebook spiral decoration */
+    .spiral {
+      position: absolute;
+      top: -30px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 100%;
+      height: 100px;
+      background: url('https://png.pngtree.com/png-vector/20220527/ourmid/pngtree-gold-horizontal-spiral-for-open-notebook-and-calendar-png-image_4750251.png') no-repeat center center; 
+      background-size: contain;
+    }
+
+    h2 {
+      color: rgb(0, 177, 165);
+      font-size: 26px;
+      margin-bottom: 10px;
+    }
+
+    /* Improved styling for select and input elements */
+    select, input[type="number"] {
+      width: 90%;
+      margin: 5px 0;
+      padding: 10px;
+      border: 2px solid #00b1a5;
+      border-radius: 15px;
+      font-size: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      background: rgba(255, 255, 255, 0.9);
+      color: #333;
+      text-align: center;
+      transition: 0.3s;
+    }
+
+    select:hover, input[type="number"]:hover {
+      background: rgb(255, 255, 255);
+    }
+
+    /* Style the file input to look like a teal button */
+    input[type="file"] {
+      background: rgb(0, 177, 165);
+      color: white;
+      border: none;
+      border-radius: 20px;
+      padding: 10px;
+      font-size: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      cursor: pointer;
+      transition: 0.3s ease-in-out;
+      width: auto;
+    }
+    input[type="file"]:hover {
+      background: rgba(0, 177, 165, 0.8);
+      transform: scale(1.05);
+    }
+
+    .attendance-group {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin: 10px 0;
+    }
+
+    .attendance-group div {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .attendance-group label {
+      font-size: 16px;
+      font-weight: bold;
+      margin: 0;
+    }
+
+    .lab-container {
+      display: flex;
+      justify-content: space-between;
+      gap: 20px;
+    }
+
+    .lab-column {
+      width: 48%;
+    }
+
+    .lab-field {
+      margin-bottom: 15px;
+      text-align: left;
+    }
+
+    .lab-field label {
+      font-size: 16px;
+      font-weight: bold;
+      margin-bottom: 5px;
+      display: block;
+      color: rgb(0, 177, 165);
+    }
+
+    h3 {
+      color: #00b1a5;
+      margin-top: 20px;
+      font-size: 20px;
+      font-weight: bold;
+      text-align: center;
+      border-bottom: 2px solid #00b1a5;
+      padding-bottom: 5px;
+    }
+
+    button {
+      width: 30%;
+      padding: 10px;
+      background: rgb(0, 177, 165);
+      color: white;
+      cursor: pointer;
+      border: none;
+      border-radius: 20px;
+      font-size: 16px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+      transition: 0.3s ease-in-out;
+      box-shadow: 0 5px 10px rgba(138, 138, 138, 0.65);
+      margin-top: 10px;
+    }
+
+    button:hover {
+      background: rgba(0, 177, 165, 0.57);
+      transform: scale(1.05);
+    }
+
+    .buttons {
+      display: flex;
+      justify-content: space-around;
+      margin-top: 15px;
+    }
+
+    label {
+      display: block;
+      font-weight: bold;
+      margin-top: 10px;
+      color: rgb(0, 0, 0);
+    }
+
+    .error-message {
+      font-size: 14px;
+      font-weight: normal;
+      color: #ff006a;
+      display: block;
+      margin-top: 5px;
+    }
+
+    h2::after {
+      content: " 💻";
+      animation: sparkle 1.5s infinite;
+    }
+
+    @keyframes sparkle {
+      0% { opacity: 1; }
+      50% { opacity: 0.5; }
+      100% { opacity: 1; }
+    }
+    
+    /* Modal overlay style for GIF and details */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.75);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 999;
+    }
+
+    .modal-content {
+      background: #fff;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: center;
+      color: #333;
+      position: relative;
+      max-width: 90%;
+    }
+    .modal-content img {
+      max-width: 100%;
+      height: auto;
+    }
+    .close-modal {
+      position: absolute;
+      top: 5px;
+      right: 10px;
+      background: rgb(0, 198, 145);
+      border: none;
+      color: #fff;
+      font-size: 16px;
+      border-radius: 50%;
+      width: 30px;
+      height: 30px;
+      cursor: pointer;
+    }
+    
+    /* Styling for calculation details table */
+    .details-table {
+      width: 100%;
+      border-collapse: collapse;
+      margin-top: 10px;
+    }
+    .details-table td, .details-table th {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+    }
+    .details-table th {
+      background-color: #80cbc4;  /* Pastel teal */
+      color: white;
+    }
+    /* Alternate row coloring for details table */
+    .details-table tr:nth-child(even) {
+      background-color: #e0f2f1; /* Light pastel teal */
+    }
+    /* Table for CSV results (Lecture) */
+    #lectureCsvSection, #labCsvSection {
+      margin-top: 30px;
+    }
+    #csvResultsTable, #labCsvResultsTable {
+      width: 100%;
+      border-collapse: collapse;
+      margin: 20px auto;
+      text-align: center;
+    }
+    #csvResultsTable th, #csvResultsTable td,
+    #labCsvResultsTable th, #labCsvResultsTable td {
+      border: 1px solid #999;
+      padding: 8px;
+    }
+    #csvResultsTable th, #labCsvResultsTable th {
+      background-color: #80cbc4; /* Pastel teal */
+      color: black;
+    }
+    /* Alternate row coloring for CSV results tables */
+    #csvResultsTable tr:nth-child(even),
+    #labCsvResultsTable tr:nth-child(even) {
+      background-color: #e0f2f1; /* Light pastel teal */
+    }
+    /* Hide lecture/lab CSV sections by default */
+    #lectureCsvSection, #labCsvSection {
+      display: none;
+    }
+    /* Custom styling for the file input button */
+    .custom-file-button {
+    display: inline-block;
+    padding: 10px 20px;
+    background: rgb(0, 177, 165);
+    color: white;
+    font-size: 16px;
+    font-family: 'Montserrat', sans-serif;
+    font-weight: 600;
+    border: none;
+    border-radius: 20px;
+    cursor: pointer;
+    transition: 0.3s ease-in-out;
+    text-decoration: none;
+    margin-bottom: 10px;
+    }
+    .custom-file-button:hover {
+    background: rgba(0, 177, 165, 0.8);
+    transform: scale(1.05);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="spiral"></div>
+    <h2>Programming 2 - Grade Calculator</h2>
+    <label for="gradeType">Choose whether you want to compute for Laboratory or Lecture grades.</label>
+    <select id="gradeType">
+      <option value="lecture">Lecture</option>
+      <option value="laboratory">Laboratory</option>
+    </select>
+    
+    <!-- Attendance Checkboxes -->
+    <label>Attendance (Mark as present):</label>
+    <div class="attendance-group">
+      <!-- Lecture Dates -->
+      <div id="lectureAttendance">
+        <div>
+          <input type="checkbox" id="jan21">
+          <label for="jan21">Jan 21</label>
+        </div>
+        <div>
+          <input type="checkbox" id="jan28">
+          <label for="jan28">Jan 28</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb04">
+          <label for="feb04">Feb 4</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb11">
+          <label for="feb11">Feb 11</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb18">
+          <label for="feb18">Feb 18</label>
+        </div>
+      </div>
+
+      <!-- Laboratory Dates -->
+      <div id="labAttendance">
+        <div>
+          <input type="checkbox" id="jan23">
+          <label for="jan23">Jan 23</label>
+        </div>
+        <div>
+          <input type="checkbox" id="jan30">
+          <label for="jan30">Jan 30</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb06">
+          <label for="feb06">Feb 6</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb13">
+          <label for="feb13">Feb 13</label>
+        </div>
+        <div>
+          <input type="checkbox" id="feb20">
+          <label for="feb20">Feb 20</label>
+        </div>
+      </div>
+    </div>
+
+    <span class="error-message" id="attendance-error"></span>
+    <br>
+
+    <div id="inputFields"></div>
+    <div class="buttons">
+      <button onclick="calculateGrade()">Calculate</button>
+      <button onclick="clearFields()">Clear</button>
+      <button onclick="showDetails()">View Grade Breakdown</button>
+    </div>
+    <h3 id="result"></h3>
+
+    <!-- CSV Upload Feature for Lecture -->
+<div id="lectureCsvSection">
+  <h2>Upload File (LEC)</h2>
+  <p style="font-size:14px;">
+    Expected columns: <strong>Name, Absences, Essay, PVM, Java Basics, Intro to JS, Exam Score</strong>
+  </p>
+  <!-- Hidden file input -->
+  <input type="file" id="csvFileInput" accept=".csv" style="display:none;" />
+  <!-- Custom teal button to trigger file selection -->
+  <label for="csvFileInput" class="custom-file-button">Select File</label>
+  <span id="csvFileName" style="display: block; margin-top: 5px; font-weight: bold;"></span>
+  <br /><br />
+  <button onclick="processCSV()">Read File</button>
+  
+  <!-- Table to display CSV data + computed Prelim Grade for Lecture -->
+  <table id="csvResultsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Absences</th>
+        <th>Essay</th>
+        <th>PVM</th>
+        <th>Java Basics</th>
+        <th>Intro to JS</th>
+        <th>Exam Score</th>
+        <th>Prelim Grade</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+<!-- CSV Upload Feature for Laboratory -->
+<div id="labCsvSection">
+  <h2>Upload File (LAB)</h2>
+  <p style="font-size:14px;">
+    Expected columns: <strong>Name, Absences, MP1, MP2, MP3, MP3 (Docu), Java 1, Java 2, JS 1, JS 2</strong>
+  </p>
+  <!-- Hidden file input -->
+  <input type="file" id="labCsvFileInput" accept=".csv" style="display:none;" />
+  <!-- Custom teal button to trigger file selection -->
+  <label for="labCsvFileInput" class="custom-file-button">Select File</label>
+  <span id="csvFileName" style="display: block; margin-top: 5px; font-weight: bold;"></span>
+  <br /><br />
+  <button onclick="processLabCSV()">Read File</button>
+
+  <!-- Table to display CSV data + computed Prelim Grade for Laboratory -->
+  <table id="labCsvResultsTable">
+    <thead>
+      <tr>
+        <th>Name</th>
+        <th>Absences</th>
+        <th>MP1</th>
+        <th>MP2</th>
+        <th>MP3</th>
+        <th>MP3 (Docu)</th>
+        <th>Java 1</th>
+        <th>Java 2</th>
+        <th>JS 1</th>
+        <th>JS 2</th>
+        <th>Prelim Grade</th>
+      </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+</div>
+
+
+  <!-- Modal for GIF (pass/fail) -->
+  <div class="modal-overlay" id="gifModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('gifModal')">&times;</button>
+      <img id="resultGif" src="" alt="Result GIF">
+    </div>
+  </div>
+
+  <!-- Modal for Calculation Details -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-content">
+      <button class="close-modal" onclick="closeModal('detailsModal')">&times;</button>
+      <div id="detailsContent"></div>
+    </div>
+  </div>
+
+  <script>
+    // Toggle the attendance checkboxes based on the selected grade type.
+    function toggleAttendance() {
+      const gradeType = document.getElementById('gradeType').value;
+      if (gradeType === 'lecture') {
+        document.getElementById('lectureAttendance').style.display = 'block';
+        document.getElementById('labAttendance').style.display = 'none';
+      } else {
+        document.getElementById('lectureAttendance').style.display = 'none';
+        document.getElementById('labAttendance').style.display = 'block';
+      }
+    }
+
+    // Set up the event listeners for grade type change.
+    document.getElementById('gradeType').addEventListener('change', toggleAttendance);
+    window.addEventListener('DOMContentLoaded', toggleAttendance);
+
+    // ========== SHOW/HIDE CSV SECTIONS BASED ON SELECTION ==========
+    const gradeTypeSelect = document.getElementById('gradeType');
+    const lectureCsvSection = document.getElementById('lectureCsvSection');
+    const labCsvSection = document.getElementById('labCsvSection');
+
+    gradeTypeSelect.addEventListener('change', generateInputs);
+
+    function generateInputs() {
+      let type = gradeTypeSelect.value;
+      let container = document.getElementById('inputFields');
+      container.innerHTML = ""; // Clear previous inputs
+
+      // Show/hide the correct CSV section
+      if (type === "lecture") {
+        lectureCsvSection.style.display = "block";
+        labCsvSection.style.display = "none";
+
+        container.innerHTML += `
+          <label>Essay:</label>
+          <input type='number' class='gradeInput' id='essay' min='0' max='100' oninput='validateInput(this, 100)'>
+          <span class="error-message" id="essay-error"></span><br>
+          <label>PVM:</label>
+          <input type='number' class='gradeInput' id='pvm' min='0' max='60' oninput='validateInput(this, 60)'>
+          <span class="error-message" id="pvm-error"></span><br>
+          <label>Java Basics:</label>
+          <input type='number' class='gradeInput' id='javabasics' min='0' max='40' oninput='validateInput(this, 40)'>
+          <span class="error-message" id="javabasics-error"></span><br>
+          <label>Intro to JS:</label>
+          <input type='number' class='gradeInput' id='introtojs' min='0' max='40' oninput='validateInput(this, 40)'>
+          <span class="error-message" id="introtojs-error"></span><br>
+          <label>Exam Score:</label>
+          <input type='number' class='gradeInput' id='examscore' min='0' max='100' oninput='validateInput(this, 100)'>
+          <span class="error-message" id="examscore-error"></span><br>`;
+      } else {
+        lectureCsvSection.style.display = "none";
+        labCsvSection.style.display = "block";
+
+        // Laboratory inputs with two-column layout
+        container.innerHTML = `
+          <div class="lab-container">
+            <div class="lab-column" id="lab-left">
+              <h3>Laboratory Requirement</h3>
+              <div class="lab-field">
+                <label>MP1:</label>
+                <input type='number' class='gradeInput' id='mp1' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="mp1-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>MP2:</label>
+                <input type='number' class='gradeInput' id='mp2' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="mp2-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>MP3:</label>
+                <input type='number' class='gradeInput' id='mp3' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="mp3-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>MP3 (Docu):</label>
+                <input type='number' class='gradeInput' id='mp3docu' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="mp3docu-error"></span>
+              </div>
+            </div>
+            <div class="lab-column" id="lab-right">
+              <div class="lab-field">
+                <h3>Prelim Exam</h3>
+                <label>Java 1:</label>
+                <input type='number' class='gradeInput' id='java1' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="java1-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>Java 2:</label>
+                <input type='number' class='gradeInput' id='java2' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="java2-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>JS 1:</label>
+                <input type='number' class='gradeInput' id='js1' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="js1-error"></span>
+              </div>
+              <div class="lab-field">
+                <label>JS 2:</label>
+                <input type='number' class='gradeInput' id='js2' min='0' max='100' oninput='validateInput(this, 100)'>
+                <span class="error-message" id="js2-error"></span>
+              </div>
+            </div>
+          </div>`;
+      }
+    }
+
+    function calculateGrade() {
+      try {
+        let type = document.getElementById('gradeType').value;
+        let attendanceDates = [];
+        if (type === "lecture") {
+          attendanceDates = ["jan21", "jan28", "feb04", "feb11", "feb18"];
+        } else {
+          attendanceDates = ["jan23", "jan30", "feb06", "feb13", "feb20"];
+        }
+
+        // Count absences (unchecked boxes)
+        let absences = 0;
+        attendanceDates.forEach(id => {
+          if (!document.getElementById(id).checked) {
+            absences++;
+          }
+        });
+
+        let inputs = document.querySelectorAll('.gradeInput');
+        let values = {};
+        for (let input of inputs) {
+          let val = parseFloat(input.value);
+          let maxVal = parseFloat(input.getAttribute("max"));
+          if (isNaN(val) || val < 0 || (maxVal && val > maxVal)) {
+            document.getElementById('result').innerText = "Invalid grade entered. Please check all inputs.";
+            return;
+          }
+          values[input.id] = val;
+        }
+
+        let prelimGrade, details = "";
+        if (type === "lecture") {
+          let essayPct = values.essay; 
+          let pvmPct = (values.pvm / 60) * 100;
+          let javaBasicsPct = (values.javabasics / 40) * 100;
+          let introToJsPct = (values.introtojs / 40) * 100;
+          let quizAvg = (essayPct + pvmPct + javaBasicsPct + introToJsPct) / 4;
+          let attendanceScore = 100 - (absences * 10);
+          let examScore = values.examscore;
+          let classStanding = (quizAvg * 0.6) + (attendanceScore * 0.4);
+          prelimGrade = (examScore * 0.6) + (classStanding * 0.4);
+
+          details = `
+            <h3>Lecture Breakdown</h3>
+            <table class="details-table">
+              <tr><th>Component</th><th>Score</th></tr>
+              <tr><td>Essay</td><td>${values.essay}/100 (${essayPct.toFixed(2)}%)</td></tr>
+              <tr><td>PVM</td><td>${values.pvm}/60 (${pvmPct.toFixed(2)}%)</td></tr>
+              <tr><td>Java Basics</td><td>${values.javabasics}/40 (${javaBasicsPct.toFixed(2)}%)</td></tr>
+              <tr><td>Intro to JS</td><td>${values.introtojs}/40 (${introToJsPct.toFixed(2)}%)</td></tr>
+            </table>
+            <p>Quiz Average: ${quizAvg.toFixed(2)}%</p>
+            <p>Exam Score: ${examScore}</p>
+            <p>Attendance Score: ${attendanceScore}</p>
+            <p>Class Standing (60% Quiz Avg + 40% Attendance): ${classStanding.toFixed(2)}</p>
+            <p><strong>Prelim Grade: ${prelimGrade.toFixed(2)}</strong></p>`;
+        } else {
+          let examScore = (values.java1 * 0.2) + (values.java2 * 0.3) + (values.js1 * 0.2) + (values.js2 * 0.3);
+          let labWork = ((values.mp1 || 0) + (values.mp2 || 0) + (values.mp3 || 0) + (values.mp3docu || 0)) / 4;
+          let attendanceScore = 100 - (absences * 10);
+          let classStanding = (labWork * 0.6) + (attendanceScore * 0.4);
+          prelimGrade = (examScore * 0.6) + (classStanding * 0.4);
+
+          details = `
+            <h3>Laboratory Breakdown</h3>
+            <table class="details-table">
+              <tr><th>Component</th><th>Score</th></tr>
+              <tr><td>MP1</td><td>${values.mp1}</td></tr>
+              <tr><td>MP2</td><td>${values.mp2}</td></tr>
+              <tr><td>MP3</td><td>${values.mp3}</td></tr>
+              <tr><td>MP3 (Docu)</td><td>${values.mp3docu}</td></tr>
+            </table>
+            <p>Lab Work Average: ${labWork.toFixed(2)}</p>
+            <table class="details-table">
+              <tr><th>Component</th><th>Score</th></tr>
+              <tr><td>Java 1</td><td>${values.java1}</td></tr>
+              <tr><td>Java 2</td><td>${values.java2}</td></tr>
+              <tr><td>JS 1</td><td>${values.js1}</td></tr>
+              <tr><td>JS 2</td><td>${values.js2}</td></tr>
+            </table>
+            <p>Exam Score (Weighted): ${examScore.toFixed(2)}</p>
+            <p>Attendance Score: ${attendanceScore}</p>
+            <p>Class Standing (60% Lab Work + 40% Attendance): ${classStanding.toFixed(2)}</p>
+            <p><strong>Prelim Grade: ${prelimGrade.toFixed(2)}</strong></p>`;
+        }
+
+        calculationData = {
+          grade: prelimGrade,
+          details: details,
+          absences: absences
+        };
+
+        if (absences >= 3) {
+          document.getElementById('result').innerText = "Failed due to excessive absences.";
+          showGif(false);
+        } else {
+          document.getElementById('result').innerText = `Prelim Grade: ${prelimGrade.toFixed(2)}`;
+          showGif(prelimGrade >= 75);
+        }
+      } catch (error) {
+        console.error("Error calculating grade:", error);
+        document.getElementById('result').innerText = "An error occurred during calculation. Please try again.";
+      }
+    }
+
+    function validateInput(input, maxVal) {
+      let value = parseFloat(input.value);
+      let errorMsg = document.getElementById(input.id + "-error");
+
+      if (!errorMsg) {
+        errorMsg = document.createElement("small");
+        errorMsg.id = input.id + "-error";
+        errorMsg.style.color = "yellow";
+        input.parentNode.appendChild(errorMsg);
+      }
+
+      if (isNaN(value) || value < 0 || value > maxVal) {
+        errorMsg.innerText = `Enter a valid grade (0-${maxVal})`;
+      } else {
+        errorMsg.innerText = "";
+      }
+    }
+
+    function clearFields() {
+      let type = document.getElementById('gradeType').value;
+      let attendanceDates = [];
+      if (type === "lecture") {
+        attendanceDates = ["jan21", "jan28", "feb04", "feb11", "feb18"];
+      } else {
+        attendanceDates = ["jan23", "jan30", "feb06", "feb13", "feb20"];
+      }
+      
+      attendanceDates.forEach(id => {
+        let checkbox = document.getElementById(id);
+        if (checkbox) {
+          checkbox.checked = false;
+        }
+      });
+      document.getElementById('inputFields').innerHTML = "";
+      document.getElementById('result').innerText = "";
+      generateInputs();
+    }
+
+    function showGif(passed) {
+      let gifModal = document.getElementById('gifModal');
+      let resultGif = document.getElementById('resultGif');
+      resultGif.src = passed ? "congrats.gif" : "failed.gif";
+      gifModal.style.display = "flex";
+    }
+
+    function showDetails() {
+      if (!calculationData.details) {
+        alert("Please calculate the grade first.");
+        return;
+      }
+      document.getElementById('detailsContent').innerHTML = calculationData.details;
+      document.getElementById('detailsModal').style.display = "flex";
+    }
+
+    function closeModal(modalId) {
+      document.getElementById(modalId).style.display = "none";
+    }
+
+    generateInputs();
+
+    let calculationData = {};
+
+    function processCSV() {
+      const fileInput = document.getElementById('csvFileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select a file first for Lecture!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const csvData = e.target.result;
+        parseAndComputeCSV(csvData);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseAndComputeCSV(csvData) {
+      const lines = csvData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      let startIndex = 0;
+      const firstLineCols = lines[0].split(',');
+      if (firstLineCols[0].toLowerCase().includes('name')) {
+        startIndex = 1;
+      }
+      const tableBody = document.querySelector('#csvResultsTable tbody');
+      tableBody.innerHTML = '';
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim());
+        if (cols.length < 7) continue;
+
+        const name = cols[0];
+        const absences = parseInt(cols[1]) || 0;
+        const essay = parseFloat(cols[2]) || 0;
+        const pvm = parseFloat(cols[3]) || 0;
+        const javaBasics = parseFloat(cols[4]) || 0;
+        const introToJs = parseFloat(cols[5]) || 0;
+        const examScore = parseFloat(cols[6]) || 0;
+
+        let finalGradeText = '';
+        if (absences >= 4) {
+          finalGradeText = 'Failed (Excessive Absences)';
+        } else {
+          const essayPct = essay;
+          const pvmPct = (pvm / 60) * 100;
+          const javaBasicsPct = (javaBasics / 40) * 100;
+          const introToJsPct = (introToJs / 40) * 100;
+          const quizAvg = (essayPct + pvmPct + javaBasicsPct + introToJsPct) / 4;
+          const attendanceScore = 100 - (absences * 10);
+          const classStanding = (quizAvg * 0.6) + (attendanceScore * 0.4);
+          const prelimGrade = (examScore * 0.6) + (classStanding * 0.4);
+          finalGradeText = prelimGrade.toFixed(2);
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${name}</td>
+          <td>${absences}</td>
+          <td>${essay}</td>
+          <td>${pvm}</td>
+          <td>${javaBasics}</td>
+          <td>${introToJs}</td>
+          <td>${examScore}</td>
+          <td>${finalGradeText}</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    }
+
+    function processLabCSV() {
+      const fileInput = document.getElementById('labCsvFileInput');
+      const file = fileInput.files[0];
+      if (!file) {
+        alert('Please select a file first for Laboratory!');
+        return;
+      }
+
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        const csvData = e.target.result;
+        parseAndComputeLabCSV(csvData);
+      };
+      reader.readAsText(file);
+    }
+
+    function parseAndComputeLabCSV(csvData) {
+      const lines = csvData.split('\n').map(line => line.trim()).filter(line => line !== '');
+      let startIndex = 0;
+      const firstLineCols = lines[0].split(',');
+      if (firstLineCols[0].toLowerCase().includes('name')) {
+        startIndex = 1;
+      }
+      const tableBody = document.querySelector('#labCsvResultsTable tbody');
+      tableBody.innerHTML = '';
+
+      for (let i = startIndex; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim());
+        if (cols.length < 10) continue;
+
+        const name = cols[0];
+        const absences = parseInt(cols[1]) || 0;
+        const mp1 = parseFloat(cols[2]) || 0;
+        const mp2 = parseFloat(cols[3]) || 0;
+        const mp3 = parseFloat(cols[4]) || 0;
+        const mp3Docu = parseFloat(cols[5]) || 0;
+        const java1 = parseFloat(cols[6]) || 0;
+        const java2 = parseFloat(cols[7]) || 0;
+        const js1 = parseFloat(cols[8]) || 0;
+        const js2 = parseFloat(cols[9]) || 0;
+
+        let finalGradeText = '';
+        if (absences >= 4) {
+          finalGradeText = 'Failed (Excessive Absences)';
+        } else {
+          const examScore = (java1 * 0.2) + (java2 * 0.3) + (js1 * 0.2) + (js2 * 0.3);
+          const labWork = (mp1 + mp2 + mp3 + mp3Docu) / 4;
+          const attendanceScore = 100 - (absences * 10);
+          const classStanding = (labWork * 0.6) + (attendanceScore * 0.4);
+          const prelimGrade = (examScore * 0.6) + (classStanding * 0.4);
+          finalGradeText = prelimGrade.toFixed(2);
+        }
+
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${name}</td>
+          <td>${absences}</td>
+          <td>${mp1}</td>
+          <td>${mp2}</td>
+          <td>${mp3}</td>
+          <td>${mp3Docu}</td>
+          <td>${java1}</td>
+          <td>${java2}</td>
+          <td>${js1}</td>
+          <td>${js2}</td>
+          <td>${finalGradeText}</td>
+        `;
+        tableBody.appendChild(row);
+      }
+    }
+    document.getElementById("csvFileInput").addEventListener("change", function() {
+  let fileName = this.files[0] ? this.files[0].name : "No file selected";
+  document.getElementById("csvFileName").textContent = fileName;
+});
+
+document.getElementById("labCsvFileInput").addEventListener("change", function() {
+  let fileName = this.files[0] ? this.files[0].name : "No file selected";
+  document.getElementById("labCsvFileName").textContent = fileName;
+});
+
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,22 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "java",
+            "name": "GradeCalculator",
+            "request": "launch",
+            "mainClass": "GradeCalculator",
+            "projectName": "Programming 2 - LAB Midterm_4ee8c19e"
+        },
+        {
+            "type": "java",
+            "request": "launch",
+            "name": "Run EsportsPieChartSwing",
+            "mainClass": "EsportsPieChartSwing",
+            "classPaths": [
+                "lib/jfreechart-1.5.3.jar",
+                "lib/jcommon-1.0.19.jar"
+            ]
+        }
+    ]
+}
